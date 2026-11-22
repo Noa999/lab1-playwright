@@ -55,3 +55,24 @@ test('түгжигдсэн хэрэглэгч нэвтэрч чадахгүй', 
   await expect(page.getByText('this user has been locked out')).toBeVisible();
   await expect(page).toHaveURL('https://www.saucedemo.com/');
 });
+
+// Тест 4: нэвтэрсний дараах үйлдэл: бараа сагсанд хийх.
+// Элементүүдийг getByTestId-ээр олсон (saucedemo-ийн data-test атрибут, config-д
+// testIdAttribute: 'data-test' гэж зааж өгсөн). Ийм locator нь текст, дизайн
+// өөрчлөгдсөн ч тогтвортой байдаг.
+test('барааг сагсанд нэмэх', async ({ page }) => {
+  await login(page, 'standard_user', 'secret_sauce');
+
+  await page.getByTestId('add-to-cart-sauce-labs-backpack').click();
+
+  // Товч "Remove" болж, сагсны тоолуур 1 болсон эсэх
+  await expect(page.getByTestId('remove-sauce-labs-backpack')).toBeVisible();
+  await expect(page.getByTestId('shopping-cart-badge')).toHaveText('1');
+
+  // Сагс руу орж, нэмсэн бараа харагдаж буйг шалгах
+  await page.getByTestId('shopping-cart-link').click();
+  await expect(page).toHaveURL(/cart\.html/);
+  await expect(page.getByText('Sauce Labs Backpack', { exact: true })).toBeVisible();
+
+  await logout(page);
+});
