@@ -33,3 +33,25 @@ test('амжилттай нэвтрэх', async ({ page }) => {
 
   await logout(page);
 });
+
+// Тест 2 (сөрөг): буруу нууц үгээр нэвтрэхэд алдааны мессеж гарах ёстой.
+// Нэвтрээгүй тул logout хийх шаардлагагүй, харин хэрэглэгч нэвтрэх
+// хуудсан дээрээ үлдсэнийг шалгана.
+test('буруу нууц үгээр нэвтрэхэд алдаа гарна', async ({ page }) => {
+  await login(page, 'standard_user', 'wrong_password');
+
+  await expect(
+    page.getByText('Username and password do not match any user in this service')
+  ).toBeVisible();
+  // Бүтээгдэхүүний хуудас руу орж чадаагүй, нэвтрэх хуудсандаа үлдсэн
+  await expect(page).toHaveURL('https://www.saucedemo.com/');
+});
+
+// Тест 3 (сөрөг): түгжигдсэн хэрэглэгч зөв нууц үгтэй байсан ч нэвтэрч болохгүй.
+// Тест 2-оос өөр алдааны мессеж шалгаж байгаа тул өөр сценари болно.
+test('түгжигдсэн хэрэглэгч нэвтэрч чадахгүй', async ({ page }) => {
+  await login(page, 'locked_out_user', 'secret_sauce');
+
+  await expect(page.getByText('this user has been locked out')).toBeVisible();
+  await expect(page).toHaveURL('https://www.saucedemo.com/');
+});
